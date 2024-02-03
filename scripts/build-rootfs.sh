@@ -118,6 +118,9 @@ update-locale LANG="en_US.UTF-8"
 apt-get -y update && apt-get -y install software-properties-common
 add-apt-repository -y ppa:jjriek/rockchip
 
+# Add the ubuntusway ppa
+add-apt-repository ppa:ubuntusway-dev/stable
+
 # Download and update installed packages
 apt-get -y update && apt-get -y upgrade && apt-get -y dist-upgrade
 
@@ -228,7 +231,8 @@ set -eE
 trap 'echo Error: in $0 on line $LINENO' ERR
 
 # Desktop packages
-apt-get -y install ubuntu-desktop dbus-x11 xterm pulseaudio pavucontrol qtwayland5 \
+apt-get -y install ubuntusway-minimal ubuntusway-desktop ubuntusway-standard \
+dbus-x11 pulseaudio pavucontrol qtwayland5 \
 gstreamer1.0-plugins-bad gstreamer1.0-plugins-base gstreamer1.0-plugins-good mpv \
 gstreamer1.0-tools dvb-tools ir-keytable libdvbv5-0 libdvbv5-dev libdvbv5-doc libv4l-0 \
 libv4l2rds0 libv4lconvert0 libv4l-dev qv4l2 v4l-utils libegl-mesa0 libegl1-mesa-dev \
@@ -238,6 +242,12 @@ language-pack-en-base
 
 # Remove cloud-init and landscape-common
 apt-get -y purge cloud-init landscape-common cryptsetup-initramfs
+
+# Remove blacklisted packages
+apt-get -y purge gdm3 \
+gnome-shell gnome-control-center gnome-desktop3-data gnome-font-viewer gnome-software \
+gnome-software-common gnome-software-plugin-snap gnome-startup-applications \
+language-selector-gnome mutter snapd synaptic tilix ubuntu-desktop yelp zutty
 
 rm -rf /boot/grub/
 
@@ -275,7 +285,10 @@ cp ${overlay_dir}/usr/lib/NetworkManager/conf.d/20-override-wifi-powersave-disab
 rm -rf ${chroot_dir}/etc/systemd/system/systemd-networkd-wait-online.service.d/override.conf
 
 # Enable wayland session
-cp ${overlay_dir}/etc/gdm3/custom.conf ${chroot_dir}/etc/gdm3/custom.conf
+#cp ${overlay_dir}/etc/gdm3/custom.conf ${chroot_dir}/etc/gdm3/custom.conf
+
+# Configure greetd desktop manager
+cp -rv ${overlay_dir}/etc/greetd ${chroot_dir}/etc/greetd
 
 # Have plymouth use the framebuffer
 mkdir -p ${chroot_dir}/etc/initramfs-tools/conf-hooks.d

@@ -124,9 +124,9 @@ for type in $target; do
                 rm -f ${chroot_dir}/tmp/camera_engine_*_arm64.deb
 
                 # Hack for GDM to restart on first HDMI hotplug
-                mkdir -p ${chroot_dir}/usr/lib/scripts
-                cp ${overlay_dir}/usr/lib/scripts/gdm-hack.sh ${chroot_dir}/usr/lib/scripts/gdm-hack.sh
-                cp ${overlay_dir}/etc/udev/rules.d/99-gdm-hack.rules ${chroot_dir}/etc/udev/rules.d/99-gdm-hack.rules
+                #mkdir -p ${chroot_dir}/usr/lib/scripts
+                #cp ${overlay_dir}/usr/lib/scripts/gdm-hack.sh ${chroot_dir}/usr/lib/scripts/gdm-hack.sh
+                #cp ${overlay_dir}/etc/udev/rules.d/99-gdm-hack.rules ${chroot_dir}/etc/udev/rules.d/99-gdm-hack.rules
 
                 chroot ${chroot_dir} /bin/bash -c "apt-get -y install libwidevinecdm librockchip-mpp1 librockchip-mpp-dev librockchip-vpu0 libv4l-rkmpp librist-dev librist4 librga2 librga-dev rist-tools rockchip-mpp-demos rockchip-multimedia-config gstreamer1.0-rockchip1 chromium-browser mali-g610-firmware malirun"
             else
@@ -141,7 +141,7 @@ for type in $target; do
             cp ${overlay_dir}/etc/mpv/mpv.conf ${chroot_dir}/etc/mpv/mpv.conf
 
             # Use mpv as the default video player
-            sed -i 's/org\.gnome\.Totem\.desktop/mpv\.desktop/g' ${chroot_dir}/usr/share/applications/gnome-mimeapps.list 
+            #sed -i 's/org\.gnome\.Totem\.desktop/mpv\.desktop/g' ${chroot_dir}/usr/share/applications/gnome-mimeapps.list 
 
             # Config file for xorg
             mkdir -p ${chroot_dir}/etc/X11/xorg.conf.d
@@ -155,16 +155,16 @@ for type in $target; do
             mkdir -p ${chroot_dir}/usr/lib/chromium-browser
             cp ${overlay_dir}/etc/chromium-browser/default ${chroot_dir}/etc/chromium-browser/default
 
-            # Set chromium as default browser
-            chroot ${chroot_dir} /bin/bash -c "update-alternatives --install /usr/bin/x-www-browser x-www-browser /usr/bin/chromium-browser 500"
-            chroot ${chroot_dir} /bin/bash -c "update-alternatives --set x-www-browser /usr/bin/chromium-browser"
-            sed -i 's/firefox-esr\.desktop/chromium-browser\.desktop/g;s/firefox\.desktop;//g' ${chroot_dir}/usr/share/applications/gnome-mimeapps.list 
+            ## Set chromium as default browser
+            #chroot ${chroot_dir} /bin/bash -c "update-alternatives --install /usr/bin/x-www-browser x-www-browser /usr/bin/chromium-browser 500"
+            #chroot ${chroot_dir} /bin/bash -c "update-alternatives --set x-www-browser /usr/bin/chromium-browser"
+            #sed -i 's/firefox-esr\.desktop/chromium-browser\.desktop/g;s/firefox\.desktop;//g' ${chroot_dir}/usr/share/applications/gnome-mimeapps.list 
 
-            # Add chromium to favorites bar
-            mkdir -p ${chroot_dir}/etc/dconf/db/local.d
-            cp ${overlay_dir}/etc/dconf/db/local.d/00-favorite-apps ${chroot_dir}/etc/dconf/db/local.d/00-favorite-apps
-            cp ${overlay_dir}/etc/dconf/profile/user ${chroot_dir}/etc/dconf/profile/user
-            chroot ${chroot_dir} /bin/bash -c "dconf update"
+            ## Add chromium to favorites bar
+            #mkdir -p ${chroot_dir}/etc/dconf/db/local.d
+            #cp ${overlay_dir}/etc/dconf/db/local.d/00-favorite-apps ${chroot_dir}/etc/dconf/db/local.d/00-favorite-apps
+            #cp ${overlay_dir}/etc/dconf/profile/user ${chroot_dir}/etc/dconf/profile/user
+            #chroot ${chroot_dir} /bin/bash -c "dconf update"
         fi
     fi
 
