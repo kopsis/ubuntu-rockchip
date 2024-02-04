@@ -231,23 +231,17 @@ set -eE
 trap 'echo Error: in $0 on line $LINENO' ERR
 
 # Desktop packages
-apt-get -y install ubuntusway-minimal ubuntusway-desktop ubuntusway-standard \
-dbus-x11 pulseaudio pavucontrol qtwayland5 \
-gstreamer1.0-plugins-bad gstreamer1.0-plugins-base gstreamer1.0-plugins-good mpv \
-gstreamer1.0-tools dvb-tools ir-keytable libdvbv5-0 libdvbv5-dev libdvbv5-doc libv4l-0 \
-libv4l2rds0 libv4lconvert0 libv4l-dev qv4l2 v4l-utils libegl-mesa0 libegl1-mesa-dev \
-libgbm-dev libgl1-mesa-dev libgles2-mesa-dev libglx-mesa0 mesa-common-dev mesa-vulkan-drivers \
-mesa-utils libcanberra-pulse oem-config-gtk ubiquity-frontend-gtk ubiquity-slideshow-ubuntu \
-language-pack-en-base
+apt-get -y install ubuntusway-minimal ubuntusway-desktop ubuntusway-standard oem-config-gtk \
+gstreamer1.0-plugins-bad gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-tools mpv
+# libv4l-0 libv4l2rds0 libv4lconvert0 libv4l-dev qv4l2 v4l-utils \
+# libcanberra-pulse oem-config-gtk ubiquity-frontend-gtk ubiquity-slideshow-ubuntu \
+# language-pack-en-base
 
 # Remove cloud-init and landscape-common
 apt-get -y purge cloud-init landscape-common cryptsetup-initramfs
 
 # Remove blacklisted packages
-apt-get -y purge gdm3 \
-gnome-shell gnome-control-center gnome-desktop3-data gnome-font-viewer gnome-software \
-gnome-software-common gnome-software-plugin-snap gnome-startup-applications \
-language-selector-gnome mutter snapd synaptic tilix ubuntu-desktop yelp zutty
+apt-get -y purge gnome-desktop3-data gnome-startup-applications tilix vlc
 
 rm -rf /boot/grub/
 
@@ -284,15 +278,12 @@ cp ${overlay_dir}/usr/lib/NetworkManager/conf.d/20-override-wifi-powersave-disab
 # Ubuntu desktop uses a diffrent network manager, so remove this systemd override
 rm -rf ${chroot_dir}/etc/systemd/system/systemd-networkd-wait-online.service.d/override.conf
 
-# Enable wayland session
-#cp ${overlay_dir}/etc/gdm3/custom.conf ${chroot_dir}/etc/gdm3/custom.conf
-
 # Configure greetd desktop manager
 cp -rv ${overlay_dir}/etc/greetd ${chroot_dir}/etc/greetd
 
 # Have plymouth use the framebuffer
-mkdir -p ${chroot_dir}/etc/initramfs-tools/conf-hooks.d
-cp ${overlay_dir}/etc/initramfs-tools/conf-hooks.d/plymouth ${chroot_dir}/etc/initramfs-tools/conf-hooks.d/plymouth
+#mkdir -p ${chroot_dir}/etc/initramfs-tools/conf-hooks.d
+#cp ${overlay_dir}/etc/initramfs-tools/conf-hooks.d/plymouth ${chroot_dir}/etc/initramfs-tools/conf-hooks.d/plymouth
 
 # Mouse lag/stutter (missed frames) in Wayland sessions
 # https://bugs.launchpad.net/ubuntu/+source/mutter/+bug/1982560

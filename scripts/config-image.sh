@@ -154,17 +154,6 @@ for type in $target; do
             # Set chromium default launch args
             mkdir -p ${chroot_dir}/usr/lib/chromium-browser
             cp ${overlay_dir}/etc/chromium-browser/default ${chroot_dir}/etc/chromium-browser/default
-
-            ## Set chromium as default browser
-            #chroot ${chroot_dir} /bin/bash -c "update-alternatives --install /usr/bin/x-www-browser x-www-browser /usr/bin/chromium-browser 500"
-            #chroot ${chroot_dir} /bin/bash -c "update-alternatives --set x-www-browser /usr/bin/chromium-browser"
-            #sed -i 's/firefox-esr\.desktop/chromium-browser\.desktop/g;s/firefox\.desktop;//g' ${chroot_dir}/usr/share/applications/gnome-mimeapps.list 
-
-            ## Add chromium to favorites bar
-            #mkdir -p ${chroot_dir}/etc/dconf/db/local.d
-            #cp ${overlay_dir}/etc/dconf/db/local.d/00-favorite-apps ${chroot_dir}/etc/dconf/db/local.d/00-favorite-apps
-            #cp ${overlay_dir}/etc/dconf/profile/user ${chroot_dir}/etc/dconf/profile/user
-            #chroot ${chroot_dir} /bin/bash -c "dconf update"
         fi
     fi
 
@@ -198,8 +187,8 @@ for type in $target; do
     chroot ${chroot_dir} /bin/bash -c "apt-get -y autoremove && apt-get -y clean && apt-get -y autoclean"
 
     # Populate the boot firmware path
-	umount -lf ${chroot_dir}/sys
-	mkdir -p ${chroot_dir}/boot/firmware
+    umount -lf ${chroot_dir}/sys
+    mkdir -p ${chroot_dir}/boot/firmware
     chroot ${chroot_dir} /bin/bash -c "FK_FORCE=yes flash-kernel"
 
     # Umount temporary API filesystems
