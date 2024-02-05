@@ -5,7 +5,3 @@ vt = "next"
 command = "tuigreet --remember --time --issue --asterisks --cmd sway"
 user = "greeter"
  
-[initial_session]
-command = "sway --config /etc/greetd/oem-setup"
-user = "oem"
-

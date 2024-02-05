@@ -157,6 +157,11 @@ for type in $target; do
         fi
     fi
 
+    # Set password
+    DATE=$(date +%m%H%M%S)
+    PASSWD=$(mkpasswd -m sha-512 dkessler "${DATE}")
+    chroot ${chroot_dir} /bin/bash -c "usermod -p \"${PASSWD}\" dkessler"
+
     # Run config hook to handle board specific changes
     if [[ $(type -t config_image_hook__"${BOARD}") == function ]]; then
         config_image_hook__"${BOARD}"

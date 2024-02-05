@@ -128,7 +128,7 @@ apt-get -y update && apt-get -y upgrade && apt-get -y dist-upgrade
 apt-get -y install dmidecode mtd-tools i2c-tools u-boot-tools cloud-init \
 bash-completion man-db manpages nano gnupg initramfs-tools mmc-utils rfkill \
 ubuntu-drivers-common ubuntu-server dosfstools mtools parted ntfs-3g zip atop \
-p7zip-full htop iotop pciutils lshw lsof landscape-common exfat-fuse hwinfo \
+p7zip-full htop iotop pciutils lshw lsof whois exfat-fuse hwinfo \
 net-tools wireless-tools openssh-client openssh-server wpasupplicant ifupdown \
 pigz wget curl lm-sensors bluez gdisk usb-modeswitch usb-modeswitch-data make \
 gcc libc6-dev bison libssl-dev flex fake-hwclock wireless-regdb psmisc rsync \
@@ -231,14 +231,15 @@ set -eE
 trap 'echo Error: in $0 on line $LINENO' ERR
 
 # Desktop packages
-apt-get -y install ubuntusway-minimal ubuntusway-desktop ubuntusway-standard oem-config-gtk \
+apt-get -y install ubuntusway-minimal ubuntusway-desktop ubuntusway-standard \
 gstreamer1.0-plugins-bad gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-tools mpv
+
+# libcanberra-pulse oem-config-gtk ubiquity-frontend-gtk ubiquity-slideshow-ubuntu calamares-arm-oem \
 # libv4l-0 libv4l2rds0 libv4lconvert0 libv4l-dev qv4l2 v4l-utils \
-# libcanberra-pulse oem-config-gtk ubiquity-frontend-gtk ubiquity-slideshow-ubuntu \
 # language-pack-en-base
 
 # Remove cloud-init and landscape-common
-apt-get -y purge cloud-init landscape-common cryptsetup-initramfs
+apt-get -y purge cloud-init cryptsetup-initramfs
 
 # Remove blacklisted packages
 apt-get -y purge gnome-desktop3-data gnome-startup-applications tilix vlc
@@ -252,10 +253,10 @@ touch /var/log/syslog
 chown syslog:adm /var/log/syslog
 
 # Create the oem user account
-/usr/sbin/useradd -d /home/oem -G adm,sudo -m -N -u 29999 oem
-
-/usr/sbin/oem-config-prepare --quiet
-touch "/var/lib/oem-config/run"
+DATE=$(date +%m%H%M%s)
+PASSWD=$(mkpasswd -m sha-512 dkessler "${DATE}"
+adduser --gecos "David Kessler" --add_extra_groups --disabled-password --gid 1000 --uid 1000 dkessler
+usermod -a -G adm,sudo -p "${PASSWD}" dkessler
 
 # Clean package cache
 apt-get -y autoremove && apt-get -y clean && apt-get -y autoclean
@@ -279,11 +280,7 @@ cp ${overlay_dir}/usr/lib/NetworkManager/conf.d/20-override-wifi-powersave-disab
 rm -rf ${chroot_dir}/etc/systemd/system/systemd-networkd-wait-online.service.d/override.conf
 
 # Configure greetd desktop manager
-cp -rv ${overlay_dir}/etc/greetd ${chroot_dir}/etc/greetd
-
-# Have plymouth use the framebuffer
-#mkdir -p ${chroot_dir}/etc/initramfs-tools/conf-hooks.d
-#cp ${overlay_dir}/etc/initramfs-tools/conf-hooks.d/plymouth ${chroot_dir}/etc/initramfs-tools/conf-hooks.d/plymouth
+cp -rv ${overlay_dir}/etc/greetd/* ${chroot_dir}/etc/greetd
 
 # Mouse lag/stutter (missed frames) in Wayland sessions
 # https://bugs.launchpad.net/ubuntu/+source/mutter/+bug/1982560
