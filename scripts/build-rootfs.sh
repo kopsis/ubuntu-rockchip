@@ -128,7 +128,7 @@ apt-get -y update && apt-get -y upgrade && apt-get -y dist-upgrade
 apt-get -y install dmidecode mtd-tools i2c-tools u-boot-tools cloud-init \
 bash-completion man-db manpages nano gnupg initramfs-tools mmc-utils rfkill \
 ubuntu-drivers-common ubuntu-server dosfstools mtools parted ntfs-3g zip atop \
-p7zip-full htop iotop pciutils lshw lsof whois exfat-fuse hwinfo \
+p7zip-full htop iotop pciutils lshw lsof landscape-common exfat-fuse hwinfo \
 net-tools wireless-tools openssh-client openssh-server wpasupplicant ifupdown \
 pigz wget curl lm-sensors bluez gdisk usb-modeswitch usb-modeswitch-data make \
 gcc libc6-dev bison libssl-dev flex fake-hwclock wireless-regdb psmisc rsync \
@@ -239,10 +239,13 @@ gstreamer1.0-plugins-bad gstreamer1.0-plugins-base gstreamer1.0-plugins-good gst
 # language-pack-en-base
 
 # Remove cloud-init and landscape-common
-apt-get -y purge cloud-init cryptsetup-initramfs
+apt-get -y purge cloud-init landscape-common cryptsetup-initramfs
 
 # Remove blacklisted packages
 apt-get -y purge gnome-desktop3-data gnome-startup-applications tilix vlc
+
+# Clean package cache
+apt-get -y autoremove && apt-get -y clean && apt-get -y autoclean
 
 rm -rf /boot/grub/
 
@@ -253,13 +256,11 @@ touch /var/log/syslog
 chown syslog:adm /var/log/syslog
 
 # Create the oem user account
+echo "Creating user account"
 DATE=$(date +%m%H%M%s)
-PASSWD=$(mkpasswd -m sha-512 dkessler "${DATE}"
-adduser --gecos "David Kessler" --add_extra_groups --disabled-password --gid 1000 --uid 1000 dkessler
+PASSWD=$(mkpasswd -m sha-512 dkessler "${DATE}")
+adduser --gecos "David Kessler" --add_extra_groups --disabled-password --uid 1000 dkessler
 usermod -a -G adm,sudo -p "${PASSWD}" dkessler
-
-# Clean package cache
-apt-get -y autoremove && apt-get -y clean && apt-get -y autoclean
 EOF
 
 # Adjust hostname for desktop

@@ -72,7 +72,7 @@ for type in $target; do
     rm -rf ${chroot_dir}
     mkdir -p ${chroot_dir}
 
-    tar -xpJf ubuntu-22.04.3-${type}-arm64.rootfs.tar.xz -C ${chroot_dir}
+    XZ_OPT="-3 -T0" tar -xpJf ubuntu-22.04.3-${type}-arm64.rootfs.tar.xz -C ${chroot_dir}
 
     # Mount the temporary API filesystems
     mkdir -p ${chroot_dir}/{proc,sys,run,dev,dev/pts}
@@ -157,10 +157,21 @@ for type in $target; do
         fi
     fi
 
-    # Set password
-    DATE=$(date +%m%H%M%S)
-    PASSWD=$(mkpasswd -m sha-512 dkessler "${DATE}")
-    chroot ${chroot_dir} /bin/bash -c "usermod -p \"${PASSWD}\" dkessler"
+    # Set user password
+    cat ${chroot_dir}/etc/shadow
+    DATE=$(date +%m%H%M%s)
+    QUOTE="'"
+    # Single-quotes are added to the returned string so we don't have
+    # to escape all the special characters when the variable gets
+    # expanded in shell commands. This will break if the password
+    # string can contain single-quote characters (this nasty sed
+    # command here can deal with that:
+    # sed -e "s/'/'\\\\''/g; 1s/^/'/; \$s/\$/'/"
+    # but seems overkill).
+    PASSWD=${QUOTE}$(mkpasswd -m sha-512 dkessler "${DATE}")${QUOTE}
+    echo "Setting password ${PASSWD}"
+    chroot ${chroot_dir} /bin/bash -c "usermod -p ${PASSWD} dkessler"
+    cat ${chroot_dir}/etc/shadow
 
     # Run config hook to handle board specific changes
     if [[ $(type -t config_image_hook__"${BOARD}") == function ]]; then
@@ -201,7 +212,7 @@ for type in $target; do
     umount -lf ${chroot_dir}/* 2> /dev/null || true
 
     # Tar the entire rootfs
-    cd ${chroot_dir} && tar -cpf ../ubuntu-22.04.3-${type}-arm64-"${BOARD}".rootfs.tar . && cd .. && rm -rf ${chroot_dir}
+    cd ${chroot_dir} && XZ_OPT="-3 -T0" tar -cpf ../ubuntu-22.04.3-${type}-arm64-"${BOARD}".rootfs.tar . && cd .. && rm -rf ${chroot_dir}
     ../scripts/build-image.sh ubuntu-22.04.3-${type}-arm64-"${BOARD}".rootfs.tar
     rm -f ubuntu-22.04.3-${type}-arm64-"${BOARD}".rootfs.tar
 done
